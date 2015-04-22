@@ -11,19 +11,20 @@ class SwarmFinder():
 
         self.tree = self.create_powerset_tree()
         self.tree.show()
-        for node in self.tree.all_nodes():
-            if self.check_min_o(node.identifier):
-                if self.check_apriori_prune(node.identifier):
-                    if self.check_backward_prune(node.identifier):
-                        if self.check_closure(node.identifier):
-                            print node.identifier, "is a closed swarm"
-                        else:
-                            print node.identifier, "is a NON-CLOSED swarm"
-                    else:
-                        print node.identifier, "does not pass BACKWARD PRUNING"
+        self.find_swarms(self.tree[self.tree.root])
+
+    def find_swarms(self, node):
+        for child_id in node.fpointer:
+            if self.check_apriori_prune(child_id):
+                if self.check_backward_prune(child_id):
+                    self.find_swarms(self.tree[child_id])
+                    if self.check_closure(child_id) and self.check_min_o(child_id):
+                        print child_id, "is a closed swarm."
                 else:
-                    # print node.identifier, "does not pass A PRIORI"
-                    pass
+                    print "Backward-pruning", child_id
+            else:
+                print "Apriori-Pruning", child_id
+
 
     def powerset(self, iterable):
         s = list(iterable)
